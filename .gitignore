@@ -1,0 +1,15 @@
+# Python
+*.pyc
+*.pyo
+
+# Packages
+*.egg
+*.egg-info
+
+# MacOS
+.DS_Store
+
+# Unit test / Coverage
+.coverage
+htmlcov/
+.tox/
