@@ -48,7 +48,7 @@ setup(
     license='Apache Software License',
     author='Gregoire Vigneron',
     tests_require=['tox'],
-    install_requires=[],
+    install_requires=['lz4>=0.6.0'],
     cmdclass={'test': Tox},
     description='Web crawler and parser used to copy a website content to the locale file system.',
     long_description=long_description,
