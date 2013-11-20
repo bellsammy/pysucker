@@ -8,8 +8,8 @@ from collections import Counter
 from celery.task.control import inspect
 
 
-base_urls = 'http://www.hopwork.com'
-allowed_hosts = 'www.hopwork.com'
+base_urls = 'http://httpstat.us'
+allowed_hosts = 'httpstat.us'
 robot = Robot(base_urls, allowed_hosts)
 robot.clean()
 robot = Robot(base_urls, allowed_hosts)

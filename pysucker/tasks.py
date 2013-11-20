@@ -19,8 +19,8 @@ else:
 logger = get_task_logger(__name__)
 
 
-@app.task(name='pysucker.tasks.crawl') # rate_limit='4/s'
-def crawl(absolute_url, ressources_dir,
+@app.task(name='pysucker.tasks.crawl', bind=True)  # rate_limit='4/s'
+def crawl(self, absolute_url, ressources_dir,
           user_agent='PySucker {}'.format(__version__),
           language='en-US'):
     """Run a new Crawler for the given url.

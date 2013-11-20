@@ -26,9 +26,9 @@ class CrawlTest(unittest.TestCase):
         result = crawl('http://httpstat.us/200', RESSOURCES_PATH)
         self.assertEqual(result, '{}/httpstat.us/200'.format(RESSOURCES_PATH))
         # Errors
-        with self.assertRaises(NameError):
+        with self.assertRaises(ValueError):
             crawl('http://httpstat.us/500', RESSOURCES_PATH)
-        with self.assertRaises(NameError):
+        with self.assertRaises(ValueError):
             crawl('http://a.com', RESSOURCES_PATH)
 
 class ParseTest(unittest.TestCase):
