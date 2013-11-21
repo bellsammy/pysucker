@@ -2,7 +2,10 @@
 import itertools
 import json
 import re
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
 
 from bs4 import BeautifulSoup
 

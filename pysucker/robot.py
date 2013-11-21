@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import importlib
 import os
-from urlparse import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 
 from celery import chain
 import redis

@@ -1,10 +1,19 @@
 # -*- coding: utf-8 -*-
-import httplib
+try:
+    import httplib
+except ImportError:
+    import http.client as httplib
 import json
 import os
 import socket
-import urllib
-import urlparse
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
 
 from pysucker import __version__
 
@@ -71,12 +80,12 @@ class Crawler(object):
         url = urlparse.urlparse(self.absolute_url)
         connexion = httplib.HTTPConnection(url.netloc)
         request_url = u'{0}?{1}'.format(url.path, url.query) if url.query \
-                      else urllib.quote(url.path.encode('utf8'))
+                      else quote(url.path.encode('utf8'))
         # Fetch
         try:
             connexion.request("GET", request_url, headers=self.request_headers)
             self.response = connexion.getresponse()
-        except (httplib.HTTPException, socket.gaierror), e:
+        except (httplib.HTTPException, socket.gaierror) as e:
             self.response = None
             return False
         if self.response.status < 500:

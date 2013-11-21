@@ -15,9 +15,7 @@ execnet==1.1
 hiredis==0.1.1
 kombu==3.0.5
 lxml==3.2.4
-lz4==0.6.0
 py==1.4.18
--e git+https://gvigneron@github.com/gvigneron/pysucker.git@5d32e70a9f5ded8335592c19bb935ae35b515308#egg=pysucker-develop
 pytest==2.4.2
 pytest-cov==1.6
 pytest-xdist==1.9

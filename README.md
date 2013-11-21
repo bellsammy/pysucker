@@ -86,9 +86,19 @@ $ python pysucker/command.py clean
 
 ### Start PySucker from Python
 
+#### Start
+
 ```Python
 from pysucker.robot import Robot
 
 robot = Robot('http://httpstat.us/', 'httpstat.us')
 robot.start()
+```
+
+#### Stop and clean
+
+```Python
+from pysucker.robot import Robot
+
+Robot.clean()
 ```

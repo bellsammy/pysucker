@@ -60,7 +60,7 @@ class RobotTest(unittest.TestCase):
         robot = Robot(base_urls, allowed_hosts)
         robot.start()
         self.assertEqual(r.scard(crawled_set), 1)
-        time.sleep(2)
+        time.sleep(1)
         with open('{}/httpstat.us/200.data'.format(TEST_RESSOURCES_PATH), 'r') as f:
             ressource = f.read()
             self.assertIn('OK', ressource)

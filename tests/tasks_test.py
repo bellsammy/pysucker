@@ -5,8 +5,6 @@ import shutil
 import time
 import unittest
 
-import lz4
-
 from pysucker.default_config import RESSOURCES_PATH
 from pysucker.robot import Robot, r, crawled_set, done_counter
 from pysucker.tasks import crawl, parse, robot, count
