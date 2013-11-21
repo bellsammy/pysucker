@@ -23,7 +23,7 @@ logger = get_task_logger(__name__)
 def crawl(self, absolute_url, ressources_dir,
           user_agent='PySucker {}'.format(__version__),
           language='en-US'):
-    """Run a new Crawler for the given url.
+    """Run a new Crawler to fetch the given url.
 
     Args:
         absolute_url (str): URL to fetch.
@@ -32,7 +32,7 @@ def crawl(self, absolute_url, ressources_dir,
         language (str): HTTP header 'Accept-Language'.
 
     Returns:
-        (str): File with ressource path.
+        (str): File path with ressource.
     """
 
     crawler = Crawler(absolute_url, ressources_dir,
@@ -53,10 +53,10 @@ def crawl(self, absolute_url, ressources_dir,
 
 @app.task(name='pysucker.tasks.parse')
 def parse(path):
-    """Run a new parser for the given file.
+    """Run a new parser to extract links from the given file.
 
     Args:
-        path (str): Lz4 compressed file path to parse.
+        path (str): File path to parse.
 
     Returns:
         (list): URLs to parse, extracted from file.
@@ -69,7 +69,7 @@ def parse(path):
 
 @app.task(name="pysucker.tasks.robot")
 def robot(base_urls):
-    """Ruen a new robot for the given urls.
+    """Run a new robot for the given urls.
 
     Args:
         base_urls (iter): URLs to start crawling.
@@ -83,7 +83,7 @@ def robot(base_urls):
 
 @app.task(name='pysucker.tasks.count')
 def count(*args):
-    """Increment done counter."""
+    """Increment counter of URLs already analyzed."""
 
     from robot import r, done_counter
 

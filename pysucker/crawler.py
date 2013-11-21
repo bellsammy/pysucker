@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-A simple crawler to fetch and save http ressources.
-
-Usage example:
-    url = 'http://www.example.com'
-    crawler = Crawler(url, '/tmp/ressources')
-    if crawler.fetch():
-        crawler.save()
-"""
 import httplib
 import json
 import os
@@ -19,11 +10,23 @@ from pysucker import __version__
 
 
 class Crawler(object):
-    """A simple crawler to fetch and save http ressources.
+    """A crawler to fetch and save http ressources.
+
+    Ressources are saved in 2 files:
+        `<file name>.data` with http response body.
+        `<file name>.meta` with ressources meta like content type.
+
+    Usage:
+        ```
+        url = 'http://www.example.com'
+        crawler = Crawler(url, '/tmp/ressources')
+        if crawler.fetch():
+        crawler.save()
+        ```
 
     Args:
         absolute_url (str): URL to fetch.
-        ressources_dir (str): Base path to save file.
+        ressources_dir (str): Base path to save files.
         file_name (str): File name to save ressource.
         user_agent (str): Crawler user-agent.
         language (str): HTTP header 'Accept-Language'.
@@ -40,7 +43,7 @@ class Crawler(object):
                                 'Accept-Language': language}
 
     def url_to_filename(self, default='index.html'):
-        """Extract path and filename from url.
+        """Extract path and filename from `absolute_url`.
 
         Args:
             default (str): Default filename.
@@ -59,10 +62,10 @@ class Crawler(object):
                                                dir_name)
 
     def fetch(self):
-        """Fetch url_to_crawl and extract response.
+        """Fetch `absolute_url` and extract response.
 
         Returns:
-            (bool): True if ok, False if error
+            (bool): True if ok, False if error.
         """
 
         url = urlparse.urlparse(self.absolute_url)
@@ -82,7 +85,7 @@ class Crawler(object):
             return False
         
     def file_path(self):
-        """Returns file path."""
+        """Returns base file path."""
 
         return u'{}/{}'.format(self.ressources_dir, self.file_name)
 
@@ -93,10 +96,7 @@ class Crawler(object):
             os.makedirs(self.ressources_dir)
 
     def save(self):
-        """Save response meta data. Save response content.
-
-        Text content is compressed with lz4.
-        """
+        """Save response meta data and content."""
 
         # Check if directory exist.
         self.ensure_directory()

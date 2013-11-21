@@ -14,18 +14,23 @@ if os.environ.get("PYSUCKER_CONFIG_MODULE", None):
 else:
     conf = importlib.import_module('pysucker.default_config')
 
-r = redis.StrictRedis(host=conf.REDIS_HOST, port=conf.REDIS_PORT,
-                      db=conf.REDIS_DB)
 
+# List of already find/crawled URLs.
 crawled_set = '{}_crawled'.format(conf.PS_PROJECT_NAME)
+# Counter of URLs already analyzed.
 done_counter = '{}_done'.format(conf.PS_PROJECT_NAME)
+# List of allowed host.
 allowed_hosts_set = '{}_allowed_host'.format(conf.PS_PROJECT_NAME)
 
+
+r = redis.StrictRedis(host=conf.REDIS_HOST, port=conf.REDIS_PORT,
+                      db=conf.REDIS_DB)
 r.set(done_counter, 0)
 
+
 class Robot(object):
-    """A web crawler and parser used to copy a website content to the locale
-    file system.
+    """A web crawler to fetch web ressources, parses them to extract links, and
+    analyzes them to extract data.
 
     Args:
         base_urls (iter): URLs to start crawling.
@@ -33,7 +38,8 @@ class Robot(object):
     """
     
     def __init__(self, base_urls, allowed_hosts=None):
-        """Set bases_urls and allowed hosts."""
+        """Set `self.bases_urls` and `self.allowed_hosts`."""
+
         self.base_urls = base_urls if hasattr(base_urls, '__iter__') \
                          else [base_urls]
         # Set allowed hosts
@@ -46,8 +52,8 @@ class Robot(object):
             r.sadd(allowed_hosts_set, *self.allowed_hosts)
 
     def start(self):
-        """Start crawling and parsing base_ressources if url not already
-        crawled."""
+        """Start crawling and parsing filtered `base_urls`.
+        """
 
         # Filter urls.
         urls = self.filter_urls(self.base_urls)
@@ -63,7 +69,7 @@ class Robot(object):
 
     @classmethod
     def filter_urls(cls, urls):
-        """Filter urls to remove not allowed host and already crawled urls.
+        """Filter `urls` to remove not allowed hosts and already crawled urls.
 
         Args:
             urls (iter): URLs to filter.
@@ -79,7 +85,7 @@ class Robot(object):
 
     @classmethod
     def clean(cls):
-        """Clean robot data sets from redis."""
+        """Clean robot data in Redis."""
         
         r.delete(crawled_set)
         r.delete(allowed_hosts_set)

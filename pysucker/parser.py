@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Base parser that extract links from an HTML file.
-
-Usage example:
-    parser = Parser('/tmp/index.html.lz4')
-    links = parser.get_ressources()
-"""
 import itertools
 import json
 import re
@@ -15,12 +8,20 @@ from bs4 import BeautifulSoup
 
 
 class Parser(object):
-    """Parser for link extraction from ressource.
+    """Base parser for URLs extraction from stadard web file.
 
-    Extract file type from `<path>.meta` if exists, else assume file is html.
+    Usage:
+        ```
+        parser = Pasrer('/tmp/my_file.html')
+        urls = parser.get_absolute_urls()
+        ```
+
+        Where `urls` will be the extracted URLs.
+
+    This parser needs a meta file with ressource content-type at `<path>.meta`.
 
     Args:
-        path (str): Lz4 compressed file path to parse.
+        path (str): Path to file.
     """
 
     _content = None
@@ -41,7 +42,7 @@ class Parser(object):
         """Load file content and set metas.
 
         Args:
-            path (str): Lz4 compressed file path to load.
+            path (str): File to load.
 
         Returns:
             (tuple): (content, meta dict)
@@ -66,7 +67,10 @@ class Parser(object):
         return content, meta
 
     def get_ressources(self):
-        """Extract relative URLs find in file.
+        """Extract relative URLs from  `path` file.
+
+        Parser is only instanciate for unsupported file type. So get_ressource
+        return an empty tuple.
 
         Returns:
             (iter): URLs.
@@ -75,7 +79,10 @@ class Parser(object):
         return ()
 
     def get_absolute_urls(self):
-        """Extract all ressources absolute urls from self.soup
+        """Extract absolute urls from `path` file.
+
+        Parser is only instanciate for unsupported file type. So
+        get_absolute_urls return an empty tuple.
 
         Returns:
             (iter): Absolute URLs.
@@ -85,7 +92,15 @@ class Parser(object):
 
 
 class HtmlParser(object):
-    """HTML parsing tools.
+    """HTML parser for URLs extraction (links, img, scripts, etc.).
+
+    Usage:
+        ```
+        parser = Pasrer('<a href="/about">About me</a>', 'http://example.com')
+        urls = parser.get_absolute_urls()
+        ```
+
+        Where `urls` will be `['http://example.com/about']`.
 
     Args:
         html_code (str): HTML to parse.
@@ -97,7 +112,7 @@ class HtmlParser(object):
         self.soup = BeautifulSoup(html_code, "lxml", from_encoding='utf8')
 
     def get_ressources(self):
-        """Extract all ressources urls from self.soup
+        """Extract relative URLs from `html_code`.
 
         Returns:
             (iter): URLs.
@@ -111,7 +126,7 @@ class HtmlParser(object):
         return itertools.chain(links, scripts, imgs, css, js)
 
     def get_absolute_urls(self):
-        """Extract all ressources absolute urls from self.soup
+        """Extract absolute urls from `html_code`.
 
         Returns:
             (iter): Absolute URLs.
@@ -139,7 +154,7 @@ class HtmlParser(object):
         """
 
         return (script.get('src').strip() for script
-                in self.soup.find_all('script') if script.get('src'))
+               in self.soup.find_all('script') if script.get('src'))
 
     def get_images(self):
         """Get all src from <img> tags.
@@ -148,13 +163,14 @@ class HtmlParser(object):
             (iter): URLs.
         """
 
-        return (img.get('src').strip() for img in self.soup.find_all('img') if img.get('src'))
+        return (img.get('src').strip() for img in self.soup.find_all('img') \
+               if img.get('src'))
 
     def parse_inline_css(self):
-        """Extract inline css and return ressources.
+        """Generator that extracts URLs from inline css.
 
-        Returns:
-            (iter): URLs.
+        Yields:
+            (str): URL.
         """
 
         inlines = self.soup.find_all('style')
@@ -164,10 +180,10 @@ class HtmlParser(object):
                     yield link
 
     def parse_inline_scripts(self):
-        """Extract inline javascripts and return ressources.
+        """Generator that extracts URLs from inline javascripts.
 
-        Returns:
-            (iter): URLs.
+        Yields:
+            (str): URL.
         """
 
         inlines = self.soup.find_all('script')
@@ -183,11 +199,21 @@ class HtmlParser(object):
             (iter): URLs.
         """
 
-        return (form.get('action').strip() for form in self.soup.find_all('form'))
+        return (form.get('action').strip() for form \
+               in self.soup.find_all('form'))
 
 
 class CssParser(object):
-    """CSS parsing tools.
+    """CSS parser for URLs extraction (import, url).
+
+    Usage:
+        ```
+        parser = Pasrer('.logo{background-image:url('/logo.png')}',
+            'http://example.com')
+        urls = parser.get_absolute_urls()
+        ```
+
+        Where `urls` will be `['http://example.com/logo.png']`.
 
     Args:
         css_code (str): HTML to parse.
@@ -205,7 +231,7 @@ class CssParser(object):
         self.css_code = css_code
 
     def get_ressources(self):
-        """Extract ressources urls form self.css_code
+        """Extract relative URLs from `css_code`.
 
         Returns:
             (iter): URLs.
@@ -216,12 +242,14 @@ class CssParser(object):
         return itertools.chain(imports, urls)
 
     def get_absolute_urls(self):
-        """Extract all ressources absolute urls from self.soup
+        """Extract absolute urls from `css_code`.
 
         Returns:
             (iter): Absolute URLs.
         """
-        return (urlparse.urljoin(self.source, url) for url in self.get_ressources())
+
+        return (urlparse.urljoin(self.source, url) for url \
+               in self.get_ressources())
 
     def get_imports(self):
         """Extract url from @import statement.
@@ -243,7 +271,15 @@ class CssParser(object):
 
 
 class JavascriptParser(object):
-    """Javascript parsing tools.
+    """Javascript parser for URLs extraction.
+
+    Usage:
+        ```
+        parser = Pasrer('var url = "/file.html"', 'http://example.com')
+        urls = parser.get_absolute_urls()
+        ```
+
+        Where `urls` will be `['http://example.com/file.html']`.
 
     Args:
         js_code (str): HTML to parse.
@@ -264,7 +300,7 @@ class JavascriptParser(object):
         self.js_code = js_code
 
     def get_ressources(self):
-        """Extract ressources urls form self.js_code
+        """Extract relative URLs from `js_code`.
 
         Returns:
             (iter): URLs.
@@ -276,12 +312,14 @@ class JavascriptParser(object):
         return itertools.chain(urls, strings, mailtos)
 
     def get_absolute_urls(self):
-        """Extract all ressources absolute urls from self.soup
+        """Extract absolute urls from `js_code`.
 
         Returns:
             (iter): Absolute URLs.
         """
-        return (urlparse.urljoin(self.source, url) for url in self.get_ressources())
+
+        return (urlparse.urljoin(self.source, url) for url \
+               in self.get_ressources())
 
     def get_full_urls(self):
         """Extract full urls from self.js_code.
