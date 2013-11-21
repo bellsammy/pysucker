@@ -14,7 +14,7 @@ from tasks import crawl, parse, robot, count
 
 # Configuration.
 conf_module = os.environ.get("PYSUCKER_CONFIG_MODULE", 'pysucker.default_config')
-conf = importlib.import_module('pysucker.default_config')
+conf = importlib.import_module(conf_module)
 
 
 # List of already find/crawled URLs.

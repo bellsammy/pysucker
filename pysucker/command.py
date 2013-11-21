@@ -42,7 +42,7 @@ def logger():
         time.sleep(5)
 
 
-if __name__ == "__main__":
+def main():
     import argparse
 
     # Main parser

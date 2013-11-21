@@ -10,12 +10,11 @@ from celery.utils.log import get_task_logger
 from pysucker.crawler import Crawler
 from pysucker import __version__
 
-
 # Configuration.
 conf_module = os.environ.get("PYSUCKER_CONFIG_MODULE", 'pysucker.default_config')
-conf = importlib.import_module('pysucker.default_config')
+conf = importlib.import_module(conf_module)
 
-app = Celery('pysucker')
+app = Celery(conf.PS_PROJECT_NAME)
 app.config_from_object(conf_module)
 logger = get_task_logger(__name__)
 

@@ -69,7 +69,7 @@ See [Celery documentation](http://docs.celeryproject.org/en/latest/index.html) f
 #### Start
 
 ```zsh
-$ python pysucker/command.py start -url http://httpstat.us -host httpstat.us
+$ pysucker start -url http://httpstat.us -host httpstat.us
 ```
 
 #### Stop and clean
@@ -77,7 +77,7 @@ $ python pysucker/command.py start -url http://httpstat.us -host httpstat.us
 To delete pending Celery tasks and Redis data, run:
 
 ```zsh
-$ python pysucker/command.py clean
+$ pysucker clean
 ```
 
 ### Start PySucker from Python
@@ -119,7 +119,7 @@ $ PYSUCKER_CONFIG_MODULE="my_project.my_config" celery worker -A pysucker.tasks 
 When you run PySucker CLI:
 
 ```zsh
-$ PYSUCKER_CONFIG_MODULE="my_project.my_config" python pysucker/command.py start -url http://httpstat.us -host httpstat.us
+$ PYSUCKER_CONFIG_MODULE="my_project.my_config" pysucker start -url http://httpstat.us -host httpstat.us
 ```
 Or when you start PySucker from Python:
 

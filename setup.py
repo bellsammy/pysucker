@@ -60,6 +60,7 @@ setup(
     include_package_data=True,
     platforms='any',
     test_suite='pysucker.test.test_pysucker',
+    entry_points = {'console_scripts': ['pysucker = pysucker.command:main',]},
     classifiers = [
         'Development Status :: 1 - Planning',
         'Environment :: Web Environment',
