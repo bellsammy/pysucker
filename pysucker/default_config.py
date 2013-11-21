@@ -2,6 +2,10 @@
 
 PS_PROJECT_NAME = 'pysucker'
 
+# Crawler and Parser.
+from pysucker.parser import Parser
+PS_PARSER = Parser
+
 # Directory to save crawled ressources.
 RESSOURCES_PATH = '/tmp/pysucker'
 

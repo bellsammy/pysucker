@@ -57,12 +57,15 @@ if __name__ == "__main__":
         type=str,
         nargs='+',
         required=True,
-        help='starting URL(s).')
+        help='starting URL(s)')
     parser_start.add_argument('-host',
         type=str,
         nargs='+',
         required=True,
-        help='restrictive (list of) domain(s) to crawl.')
+        help='restrictive (list of) domain(s) to crawl')
+    parser_start.add_argument('-conf',
+        type=str,
+        help='configuration module')
     parser_start.set_defaults(func=start)
     # Clean command parser.
     parser_clean = subparsers.add_parser('clean', help='Clean robot Redis data.')

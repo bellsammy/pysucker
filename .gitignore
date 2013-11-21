@@ -8,7 +8,7 @@
 
 # MacOS
 .DS_Store
-.fuse*
+.fuse_hidden*
 
 # Unit test / Coverage
 .coverage

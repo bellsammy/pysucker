@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
 """Celery tasks."""
 import httplib
+import importlib
 import os
 
 from celery import Celery
 from celery.utils.log import get_task_logger
 
-from crawler import Crawler
-from parser import Parser
+from pysucker.crawler import Crawler
 from pysucker import __version__
 
 
+# Configuration.
+conf_module = os.environ.get("PYSUCKER_CONFIG_MODULE", 'pysucker.default_config')
+conf = importlib.import_module('pysucker.default_config')
+
 app = Celery('pysucker')
-if os.environ.get("PYSUCKER_CONFIG_MODULE", None):
-    app.config_from_envvar("PYSUCKER_CONFIG_MODULE")
-else:
-    app.config_from_object('pysucker.default_config')
+app.config_from_object(conf_module)
 logger = get_task_logger(__name__)
+
+# Load Parser
+Parser = conf.PS_PARSER
 
 
 @app.task(name='pysucker.tasks.crawl', bind=True)  # rate_limit='4/s'

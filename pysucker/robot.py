@@ -12,10 +12,9 @@ import redis
 from tasks import crawl, parse, robot, count
 
 
-if os.environ.get("PYSUCKER_CONFIG_MODULE", None):
-    conf = importlib.import_module(os.environ.get['PYSUCKER_CONFIG_MODULE'])
-else:
-    conf = importlib.import_module('pysucker.default_config')
+# Configuration.
+conf_module = os.environ.get("PYSUCKER_CONFIG_MODULE", 'pysucker.default_config')
+conf = importlib.import_module('pysucker.default_config')
 
 
 # List of already find/crawled URLs.

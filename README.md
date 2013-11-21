@@ -34,10 +34,6 @@ Usage
 
 PySucker need [Celery](http://www.celeryproject.org) and [Redis](http://redis.io).
 
-### Configuration
-
-TODO.
-
 ### Start Redis
 
 See [Redis documentation](http://redis.io/documentation).
@@ -102,3 +98,41 @@ from pysucker.robot import Robot
 
 Robot.clean()
 ```
+
+Advanced
+--------
+
+### Configuration file
+
+Default configuration parameters are in `pysucker.default_config`.
+
+You can create your own module to change some parameters.
+
+You must then specify the configuration module to use via the environment variable `PYSUCKER_CONFIG_MODULE`.
+
+When you start the Celery worker:
+
+```zsh
+$ PYSUCKER_CONFIG_MODULE="my_project.my_config" celery worker -A pysucker.tasks -Q pysucker,pysucker_crawl,pysucker_parse --loglevel=warning
+```
+
+When you run PySucker CLI:
+
+```zsh
+$ PYSUCKER_CONFIG_MODULE="my_project.my_config" python pysucker/command.py start -url http://httpstat.us -host httpstat.us
+```
+Or when you start PySucker from Python:
+
+```Python
+import os
+from pysucker.robot import Robot
+
+os.environ.setdefault('PYSUCKER_CONFIG_MODULE', 'my_project.my_config')
+
+robot = Robot('http://httpstat.us/', 'httpstat.us')
+robot.start()
+```
+
+### Change parser
+
+TODO.
