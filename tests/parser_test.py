@@ -11,42 +11,45 @@ from tests.samples.css_sample import css_sample
 from tests.samples.js_sample import js_sample
 
 
+TEST_RESSOURCES_PATH = '{}/test'.format(RESSOURCES_PATH)
+
+
 class ParserTest(unittest.TestCase):
 
     def setUp(self):
-        if not os.path.exists(RESSOURCES_PATH):
-            os.makedirs(RESSOURCES_PATH)
+        if not os.path.exists(TEST_RESSOURCES_PATH):
+            os.makedirs(TEST_RESSOURCES_PATH)
 
     def tearDown(self):
         try:
-            shutil.rmtree(RESSOURCES_PATH)
+            shutil.rmtree(TEST_RESSOURCES_PATH)
         except OSError:
             pass
 
     def test_new(self):
         # Default with unknow html file.
-        parser = Parser('{}/no_file.html'.format(RESSOURCES_PATH))
+        parser = Parser('{}/no_file.html'.format(TEST_RESSOURCES_PATH))
         self.assertIsInstance(parser, Parser)
 
     def test_load(self):
         # Default with unknow html file.
-        content, meta = Parser.load('{}/no_file.html'.format(RESSOURCES_PATH))
+        content, meta = Parser.load('{}/no_file.html'.format(TEST_RESSOURCES_PATH))
         self.assertEqual(content, '')
         self.assertEqual(meta, {})
         # Existing file.__class__
-        with open('{}/file.data'.format(RESSOURCES_PATH), 'w') as f:
+        with open('{}/file.data'.format(TEST_RESSOURCES_PATH), 'w') as f:
             f.write('<h1>My Content</h1>')
-        content, meta = Parser.load('{}/file'.format(RESSOURCES_PATH))
+        content, meta = Parser.load('{}/file'.format(TEST_RESSOURCES_PATH))
         self.assertEqual(content, '<h1>My Content</h1>')
         self.assertEqual(meta, {})
 
     def test_get_ressources(self):
-        parser = Parser('{}/no_file.html'.format(RESSOURCES_PATH))
+        parser = Parser('{}/no_file.html'.format(TEST_RESSOURCES_PATH))
         self.assertFalse(len(list(parser.get_ressources())))
         self.assertFalse(len(list(parser.get_absolute_urls())))
 
     def test_html(self):
-        file_name = '{}/file'.format(RESSOURCES_PATH)
+        file_name = '{}/file'.format(TEST_RESSOURCES_PATH)
         with open('{}.meta'.format(file_name), 'w') as f:
             json.dump({'content-type': 'text/html',
                        'url': 'http://www.example.com'}, f)
@@ -55,7 +58,7 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(parser.source, 'http://www.example.com')
 
     def test_css(self):
-        file_name = '{}/file'.format(RESSOURCES_PATH)
+        file_name = '{}/file'.format(TEST_RESSOURCES_PATH)
         with open('{}.meta'.format(file_name), 'w') as f:
             json.dump({'content-type': 'text/css',
                        'url': 'http://www.example.com'}, f)
@@ -64,7 +67,7 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(parser.source, 'http://www.example.com')
 
     def test_js(self):
-        file_name = '{}/file'.format(RESSOURCES_PATH)
+        file_name = '{}/file'.format(TEST_RESSOURCES_PATH)
         with open('{}.meta'.format(file_name), 'w') as f:
             json.dump({'content-type': 'text/javascript',
                        'url': 'http://www.example.com'}, f)

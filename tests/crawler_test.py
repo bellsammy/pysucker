@@ -8,11 +8,14 @@ from pysucker.crawler import Crawler
 from pysucker.default_config import RESSOURCES_PATH
 
 
+TEST_RESSOURCES_PATH = '{}/test'.format(RESSOURCES_PATH)
+
+
 class CrawlerTest(unittest.TestCase):
 
     def tearDown(self):
         try:
-            shutil.rmtree(RESSOURCES_PATH)
+            shutil.rmtree(TEST_RESSOURCES_PATH)
         except OSError:
             pass
 
@@ -83,24 +86,22 @@ class CrawlerTest(unittest.TestCase):
         self.assertEqual(crawler.file_path(), '/dev/null/httpstat.us/sub1/sub2/toto.php?test=1')
 
     def test_ensure_directory(self):
-        crawler = Crawler('http://httpstat.us/sub1/sub2/toto.php?test=1', RESSOURCES_PATH,
+        crawler = Crawler('http://httpstat.us/sub1/sub2/toto.php?test=1', TEST_RESSOURCES_PATH,
                           user_agent='No Agent', language='fr-FR')
         crawler.ensure_directory()
-        self.assertTrue(os.path.exists('{}/httpstat.us//sub1/sub2'.format(RESSOURCES_PATH)))
+        self.assertTrue(os.path.exists('{}/httpstat.us//sub1/sub2'.format(TEST_RESSOURCES_PATH)))
 
     def test_save(self):
-        crawler = Crawler('http://httpstat.us/301', RESSOURCES_PATH,
+        crawler = Crawler('http://httpstat.us/301', TEST_RESSOURCES_PATH,
                           user_agent='No Agent', language='fr-FR')
         if crawler.fetch():
             crawler.save()
-        with open('{}/httpstat.us/301.data'.format(RESSOURCES_PATH), 'r') as f:
+        with open('{}/httpstat.us/301.data'.format(TEST_RESSOURCES_PATH), 'r') as f:
             ressource = f.read()
             self.assertIn('301 Moved Permanently', ressource)
-        with open('{}/httpstat.us/301.meta'.format(RESSOURCES_PATH), 'r') as f:
+        with open('{}/httpstat.us/301.meta'.format(TEST_RESSOURCES_PATH), 'r') as f:
             meta = json.loads(f.read())
             self.assertIn('text/plain', meta['content-type'])
             self.assertEqual('http://httpstat.us/301', meta['url'])
             self.assertEqual(301, meta['status'])
             self.assertEqual('http://httpstat.us', meta['location'])
-        
-

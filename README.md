@@ -9,11 +9,8 @@ Another usage was the creation of modified static copies (removing ads and broke
 
 This project is an open-source rewrite of its main features.
 
-
-Documentation
--------------
-
-## Installation
+Installation
+------------
 
 ***WARNING*** This version is incomplete and not stable.
 
@@ -32,9 +29,14 @@ UnitTests can be run with [py.test](http://pytest.org/latest/) and [tox](http://
 $ py.test --cov=pysucker --cov-report=html -n=4
 ```
 
-## Usage
+Usage
+-----
 
 PySucker need [Celery](http://www.celeryproject.org) and [Redis](http://redis.io).
+
+### Configuration
+
+TODO.
 
 ### Start Redis
 
@@ -53,29 +55,40 @@ REDIS_DB = 0
 To start a Celery worker with default address and value, run:
 
 ```zsh
-$ celery worker -A pysucker.tasks -Q pysucker,pysucker_crawl,pysucker_parse --loglevel=error
+$ celery worker -A pysucker.tasks -Q pysucker,pysucker_crawl,pysucker_parse --loglevel=warning
 ```
 
 You should start multiple Celery workers to adjust concurrency with your application requirements. A basic usage on a 4 core machine with a 100Mb connexion:
 
 ```zsh
-celery worker -A pysucker.tasks -Q pysucker -n pysucker_main --loglevel=warning
-celery worker -A pysucker.tasks -Q pysucker_crawl -n pysucker_crawler --concurrency=4 --loglevel=warning
-celery worker -A pysucker.tasks -Q pysucker_parse --concurrency=5 -n pysucker_parser --loglevel=warning
+$ celery worker -A pysucker.tasks -Q pysucker -n pysucker_main --loglevel=warning
+$ celery worker -A pysucker.tasks -Q pysucker_crawl -n pysucker_crawler --concurrency=4 --loglevel=warning
+$ celery worker -A pysucker.tasks -Q pysucker_parse --concurrency=5 -n pysucker_parser --loglevel=warning
 ```
 
-### Start PySucker
+See [Celery documentation](http://docs.celeryproject.org/en/latest/index.html) for more options.
 
-Run:
+### Start PySucker from cli
+
+#### Start
 
 ```zsh
-$ python pysucker/start.py
+$ python pysucker/command.py start -url http://httpstat.us -host httpstat.us
 ```
 
-### Stop and clean
+#### Stop and clean
 
 To delete pending Celery tasks and Redis data, run:
 
 ```zsh
-$ python pysucker/clean.py
+$ python pysucker/command.py clean
+```
+
+### Start PySucker from Python
+
+```Python
+from pysucker.robot import Robot
+
+robot = Robot('http://httpstat.us/', 'httpstat.us')
+robot.start()
 ```

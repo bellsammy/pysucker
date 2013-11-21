@@ -8,16 +8,20 @@ from pysucker.default_config import RESSOURCES_PATH
 from pysucker.robot import Robot, r, crawled_set
 
 
+TEST_RESSOURCES_PATH = '{}/test'.format(RESSOURCES_PATH)
+
+
 class RobotTest(unittest.TestCase):
 
     def setUp(self):
-        if not os.path.exists(RESSOURCES_PATH):
-            os.makedirs(RESSOURCES_PATH)
+        if not os.path.exists(TEST_RESSOURCES_PATH):
+            os.makedirs(TEST_RESSOURCES_PATH)
 
     def tearDown(self):
         Robot.clean()
         try:
-            shutil.rmtree(RESSOURCES_PATH)
+            pass
+            #shutil.rmtree(TEST_RESSOURCES_PATH)
         except OSError:
             pass
     
@@ -56,7 +60,7 @@ class RobotTest(unittest.TestCase):
         robot = Robot(base_urls, allowed_hosts)
         robot.start()
         self.assertEqual(r.scard(crawled_set), 1)
-        time.sleep(1)
-        with open('{}/httpstat.us/200.data'.format(RESSOURCES_PATH), 'r') as f:
+        time.sleep(2)
+        with open('{}/httpstat.us/200.data'.format(TEST_RESSOURCES_PATH), 'r') as f:
             ressource = f.read()
             self.assertIn('OK', ressource)
