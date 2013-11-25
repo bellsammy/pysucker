@@ -1,21 +1,38 @@
+"""PySucker setup.py."""
 from __future__ import print_function
-from setuptools import setup, find_packages
+from setuptools import setup
 from setuptools.command.test import test as TestCommand
 import codecs
 import os
-import sys
 import re
+import sys
 
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 
 def read(*parts):
+    """Read parts relative path.
+
+    Returns:
+        (file)
+
+    """
     # intentionally *not* adding an encoding option to open
     return codecs.open(os.path.join(here, *parts), 'r').read()
 
 
 def find_version(*file_paths):
+    """Find version from pysucker package.
+
+    Returns:
+        (str): PySucker version.
+
+    Raises:
+        (RuntimeError): Unable to find the version.
+
+    """
+
     version_file = read(*file_paths)
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
                               version_file, re.M)
@@ -24,17 +41,23 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
-long_description = """
-"""
+long_description = """"""
+
 
 class Tox(TestCommand):
 
+    """Tox test runner."""
+
     def finalize_options(self):
+        """Finalize tox options."""
+
         TestCommand.finalize_options(self)
         self.test_args = []
         self.test_suite = True
-    
+
     def run_tests(self):
+        """Run tests with tox."""
+
         #import here, cause outside the eggs aren't loaded
         import tox
         errcode = tox.cmdline(self.test_args)
@@ -54,14 +77,15 @@ setup(
                       'beautifulsoup4>=4.3.2',
                       'lxml>=3.2.4'],
     cmdclass={'test': Tox},
-    description='Web crawler and parser used to copy a website content to the locale file system.',
+    description='Web crawler and parser used to copy a website content to the \
+locale file system.',
     long_description=long_description,
     packages=['pysucker'],
     include_package_data=True,
     platforms='any',
     test_suite='pysucker.test.test_pysucker',
-    entry_points = {'console_scripts': ['pysucker = pysucker.command:main',]},
-    classifiers = [
+    entry_points={'console_scripts': ['pysucker = pysucker.command:main', ]},
+    classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
@@ -72,8 +96,8 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Site Management',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Utilities',
-        ],
+    ],
     extras_require={
         'testing': ['pytest'],
-      }
+    }
 )

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""PySucker Robot."""
 import importlib
 import os
 try:
@@ -9,11 +10,12 @@ except ImportError:
 from celery import chain
 import redis
 
-from tasks import crawl, parse, robot, count
+from pysucker.tasks import crawl, parse, robot, count
 
 
 # Configuration.
-conf_module = os.environ.get("PYSUCKER_CONFIG_MODULE", 'pysucker.default_config')
+conf_module = os.environ.get("PYSUCKER_CONFIG_MODULE",
+                             'pysucker.default_config')
 conf = importlib.import_module(conf_module)
 
 
@@ -31,41 +33,43 @@ r.set(done_counter, 0)
 
 
 class Robot(object):
-    """A web crawler to fetch web ressources, parses them to extract links, and
-    analyzes them to extract data.
+
+    """A web crawler.
+
+    Fetch web ressources, parses them to extract links, and analyzes them to
+    extract data.
 
     Args:
         base_urls (iter): URLs to start crawling.
         allowed_host (list): Allowed hosts to crawl.
-    """
-    
-    def __init__(self, base_urls, allowed_hosts=None):
-        """Set `self.bases_urls` and `self.allowed_hosts`."""
 
+    """
+
+    def __init__(self, base_urls, allowed_hosts=None):
+        # Set `self.bases_utls`.
         self.base_urls = base_urls if hasattr(base_urls, '__iter__') \
-                         else [base_urls]
-        # Set allowed hosts
+            else [base_urls]
+        # Set  `self.allowed_hosts`.
         if allowed_hosts is None:
             self.allowed_hosts = list(r.smembers(allowed_hosts_set))
         else:
             self.allowed_hosts = list(allowed_hosts) \
-                                 if hasattr(allowed_hosts, '__iter__') \
-                                 else [allowed_hosts]
+                if hasattr(allowed_hosts, '__iter__') \
+                else [allowed_hosts]
             r.sadd(allowed_hosts_set, *self.allowed_hosts)
 
     def start(self):
-        """Start crawling and parsing filtered `base_urls`.
-        """
+        """Start crawling and parsing filtered `base_urls`."""
 
         # Filter urls.
         urls = self.filter_urls(self.base_urls)
-        
+
         for url in urls:
             # Call tasks.
-            res = chain(crawl.s(url, conf.RESSOURCES_PATH),
-                        parse.s(),
-                        robot.s(),
-                        count.s())()
+            chain(crawl.s(url, conf.RESSOURCES_PATH),
+                  parse.s(),
+                  robot.s(),
+                  count.s())()
             # Mark as crawled.
             r.sadd(crawled_set, url)
 
@@ -78,6 +82,7 @@ class Robot(object):
 
         Returns:
             (iter): Filtered URLs.
+
         """
 
         urls = (url for url in urls if not r.sismember(crawled_set, url))
@@ -88,7 +93,7 @@ class Robot(object):
     @classmethod
     def clean(cls):
         """Clean robot data in Redis."""
-        
+
         r.delete(crawled_set)
         r.delete(allowed_hosts_set)
         r.delete(done_counter)

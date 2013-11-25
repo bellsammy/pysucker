@@ -11,7 +11,8 @@ from pysucker.crawler import Crawler
 from pysucker import __version__
 
 # Configuration.
-conf_module = os.environ.get("PYSUCKER_CONFIG_MODULE", 'pysucker.default_config')
+conf_module = os.environ.get("PYSUCKER_CONFIG_MODULE",
+                             'pysucker.default_config')
 conf = importlib.import_module(conf_module)
 
 app = Celery(conf.PS_PROJECT_NAME)
@@ -36,22 +37,26 @@ def crawl(self, absolute_url, ressources_dir,
 
     Returns:
         (str): File path with ressource.
+
     """
 
     crawler = Crawler(absolute_url, ressources_dir,
                       user_agent='PySucker {}'.format(__version__),
                       language='en-US')
-    if crawler.fetch():
-        crawler.save()
-    elif crawler.response is None:
-        logger.error('httplib.HTTPException at {}'.format(absolute_url))
-        raise self.retry(exc=httplib.HTTPException())
-    else:
-        logger.error('HTTP error {} at {}'.format(crawler.response.status,
-                                                 absolute_url))
-        crawler.save()
-        raise self.retry(exc=ValueError())
-    return crawler.file_path()
+    try:
+        if crawler.fetch():
+            crawler.save()
+        elif crawler.response is None:
+            logger.error('httplib.HTTPException at {}'.format(absolute_url))
+            raise self.retry(exc=httplib.HTTPException())
+        else:
+            logger.error('HTTP error {} at {}'.format(crawler.response.status,
+                                                      absolute_url))
+            crawler.save()
+            raise self.retry(exc=ValueError())
+        return crawler.file_path()
+    except UnicodeEncodeError:
+        logger.error(absolute_url.encode('utf8'))
 
 
 @app.task(name='pysucker.tasks.parse')
@@ -63,6 +68,7 @@ def parse(path):
 
     Returns:
         (list): URLs to parse, extracted from file.
+
     """
 
     parser = Parser(path)
@@ -76,18 +82,19 @@ def robot(base_urls):
 
     Args:
         base_urls (iter): URLs to start crawling.
+
     """
 
-    from robot import Robot
+    from pysucker.robot import Robot
 
-    robot = Robot(base_urls)
-    robot.start()
+    _robot = Robot(base_urls)
+    _robot.start()
 
 
 @app.task(name='pysucker.tasks.count')
 def count(*args):
     """Increment counter of URLs already analyzed."""
 
-    from robot import r, done_counter
+    from pysucker.robot import r, done_counter
 
     r.incr(done_counter)

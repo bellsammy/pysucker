@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
-try:
-    import httplib
-except ImportError:
-    import http.client as httplib
+"""Pysucker web crawler."""
 import json
 import os
 import socket
+# Python 3 imports.
 try:
+    import httplib
     from urllib import quote
-except ImportError:
-    from urllib.parse import quote
-try:
     import urlparse
 except ImportError:
+    import http.client as httplib
+    from urllib.parse import quote
     import urllib.parse as urlparse
 
 from pysucker import __version__
 
 
 class Crawler(object):
+
     """A crawler to fetch and save http ressources.
 
     Ressources are saved in 2 files:
@@ -39,8 +38,12 @@ class Crawler(object):
         file_name (str): File name to save ressource.
         user_agent (str): Crawler user-agent.
         language (str): HTTP header 'Accept-Language'.
+
     """
-    
+
+    file_name = None
+    response = None
+
     def __init__(self, absolute_url, ressources_dir,
                  user_agent='PySucker {}'.format(__version__),
                  language='en-US'):
@@ -56,6 +59,7 @@ class Crawler(object):
 
         Args:
             default (str): Default filename.
+
         """
 
         url = urlparse.urlparse(self.absolute_url)
@@ -67,20 +71,22 @@ class Crawler(object):
         self.file_name = filename
         # Update path.
         dir_name = os.path.dirname(url.path).rstrip('/')
-        self.ressources_dir = '{}/{}{}'.format(self.ressources_dir, url.netloc,
-                                               dir_name)
+        self.ressources_dir = u'{}/{}{}'.format(self.ressources_dir,
+                                                url.netloc, dir_name)
 
     def fetch(self):
         """Fetch `absolute_url` and extract response.
 
         Returns:
             (bool): True if ok, False if error.
+
         """
 
         url = urlparse.urlparse(self.absolute_url)
         connexion = httplib.HTTPConnection(url.netloc)
-        request_url = u'{0}?{1}'.format(url.path, url.query) if url.query \
-                      else quote(url.path.encode('utf8'))
+        request_url = '{0}?{1}'.format(url.path.encode('utf8'),
+                                       url.query.encode('utf8')) \
+                      if url.query else quote(url.path.encode('utf8'))
         # Fetch
         try:
             connexion.request("GET", request_url, headers=self.request_headers)
@@ -92,9 +98,9 @@ class Crawler(object):
             return True
         else:
             return False
-        
+
     def file_path(self):
-        """Returns base file path."""
+        """Return base file path."""
 
         return u'{}/{}'.format(self.ressources_dir, self.file_name)
 

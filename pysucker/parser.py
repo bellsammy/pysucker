@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""PySucker base parser."""
 import itertools
 import json
 import re
@@ -11,6 +12,7 @@ from bs4 import BeautifulSoup
 
 
 class Parser(object):
+
     """Base parser for URLs extraction from stadard web file.
 
     Usage:
@@ -25,6 +27,7 @@ class Parser(object):
 
     Args:
         path (str): Path to file.
+
     """
 
     _content = None
@@ -49,6 +52,7 @@ class Parser(object):
 
         Returns:
             (tuple): (content, meta dict)
+
         """
 
         # Set defaults
@@ -77,6 +81,7 @@ class Parser(object):
 
         Returns:
             (iter): URLs.
+
         """
 
         return ()
@@ -89,12 +94,14 @@ class Parser(object):
 
         Returns:
             (iter): Absolute URLs.
+
         """
 
         return ()
 
 
 class HtmlParser(object):
+
     """HTML parser for URLs extraction (links, img, scripts, etc.).
 
     Usage:
@@ -108,6 +115,7 @@ class HtmlParser(object):
     Args:
         html_code (str): HTML to parse.
         source (str): Web ressource absolute URL.
+
     """
 
     def __init__(self, html_code, source=''):
@@ -119,6 +127,7 @@ class HtmlParser(object):
 
         Returns:
             (iter): URLs.
+
         """
 
         links = self.get_links()
@@ -133,14 +142,18 @@ class HtmlParser(object):
 
         Returns:
             (iter): Absolute URLs.
+
         """
-        return (urlparse.urljoin(self.source, url) for url in self.get_ressources())
+
+        return (urlparse.urljoin(self.source, url) for url
+                in self.get_ressources())
 
     def get_links(self):
         """Get all href from <link> and <a> tags.
 
         Returns:
             (iter): URLs.
+
         """
 
         a_href = (link.get('href').strip() for link in self.soup.find_all('a')
@@ -154,26 +167,29 @@ class HtmlParser(object):
 
         Returns:
             (iter): URLs.
+
         """
 
         return (script.get('src').strip() for script
-               in self.soup.find_all('script') if script.get('src'))
+                in self.soup.find_all('script') if script.get('src'))
 
     def get_images(self):
         """Get all src from <img> tags.
 
         Returns:
             (iter): URLs.
+
         """
 
-        return (img.get('src').strip() for img in self.soup.find_all('img') \
-               if img.get('src'))
+        return (img.get('src').strip() for img in self.soup.find_all('img')
+                if img.get('src'))
 
     def parse_inline_css(self):
         """Generator that extracts URLs from inline css.
 
         Yields:
             (str): URL.
+
         """
 
         inlines = self.soup.find_all('style')
@@ -187,6 +203,7 @@ class HtmlParser(object):
 
         Yields:
             (str): URL.
+
         """
 
         inlines = self.soup.find_all('script')
@@ -200,13 +217,15 @@ class HtmlParser(object):
 
         Returns:
             (iter): URLs.
+
         """
 
-        return (form.get('action').strip() for form \
-               in self.soup.find_all('form'))
+        return (form.get('action').strip() for form
+                in self.soup.find_all('form'))
 
 
 class CssParser(object):
+
     """CSS parser for URLs extraction (import, url).
 
     Usage:
@@ -221,6 +240,7 @@ class CssParser(object):
     Args:
         css_code (str): HTML to parse.
         source (str): Web ressource absolute URL.
+
     """
 
     imports = r"""@import[\s\t]*["'](?P<url>.*)["'][\s\t]*;"""
@@ -238,6 +258,7 @@ class CssParser(object):
 
         Returns:
             (iter): URLs.
+
         """
 
         imports = self.get_imports()
@@ -249,31 +270,36 @@ class CssParser(object):
 
         Returns:
             (iter): Absolute URLs.
+
         """
 
-        return (urlparse.urljoin(self.source, url) for url \
-               in self.get_ressources())
+        return (urlparse.urljoin(self.source, url) for url
+                in self.get_ressources())
 
     def get_imports(self):
         """Extract url from @import statement.
 
         Returns:
             (iter): URLs.
+
         """
 
-        return (link.strip() for link in self.imports_re.findall(self.css_code))
+        return (link.strip() for link
+                in self.imports_re.findall(self.css_code))
 
     def get_urls(self):
         """Extract url from url() value.
 
         Returns:
             (iter): URLs.
+
         """
 
         return (link.strip() for link in self.urls_re.findall(self.css_code))
 
 
 class JavascriptParser(object):
+
     """Javascript parser for URLs extraction.
 
     Usage:
@@ -287,10 +313,11 @@ class JavascriptParser(object):
     Args:
         js_code (str): HTML to parse.
         source (str): Web ressource absolute URL.
+
     """
 
-    urls = r"""["'](?P<url>[a-zA-Z][\w-]+:/{1,3}[^\s()<>'"]+[.][a-zA-Z]{2,4}[^\s()<>"']+)["']"""
-    urls_re = re.compile(urls)
+    urls_re = re.compile(r"""["'](?P<url>[a-zA-Z][\w-]+:/{1,3}[^\s()<>'"]+"""
+                         r"""[.][a-zA-Z]{2,4}[^\s()<>"']+)["']""")
 
     strings = r"""["'](?P<url>/[^\s()<>"']+\.[^\s()<>"';]{2,6})["']"""
     strings_re = re.compile(strings)
@@ -307,6 +334,7 @@ class JavascriptParser(object):
 
         Returns:
             (iter): URLs.
+
         """
 
         urls = self.get_full_urls()
@@ -319,16 +347,18 @@ class JavascriptParser(object):
 
         Returns:
             (iter): Absolute URLs.
+
         """
 
-        return (urlparse.urljoin(self.source, url) for url \
-               in self.get_ressources())
+        return (urlparse.urljoin(self.source, url) for url
+                in self.get_ressources())
 
     def get_full_urls(self):
         """Extract full urls from self.js_code.
 
         Returns:
             (iter): URLs.
+
         """
 
         return self.urls_re.findall(self.js_code)
@@ -338,6 +368,7 @@ class JavascriptParser(object):
 
         Returns:
             (iter): URLs.
+
         """
 
         return self.strings_re.findall(self.js_code)
@@ -347,6 +378,7 @@ class JavascriptParser(object):
 
         Returns:
             (iter): URLs.
+
         """
-        
+
         return self.mailto_re.findall(self.js_code)
